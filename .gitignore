@@ -1,0 +1,21 @@
+# Bundler
+/.bundle/
+*.bundle
+
+# YARD
+/.yardoc
+/_yardoc/
+/doc/
+
+# RSpec
+/spec/examples.txt
+
+# Coverage
+/coverage/
+/spec/reports/
+
+# RubyGems
+/pkg/
+
+# Temp
+/tmp/

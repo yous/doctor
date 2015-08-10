@@ -1,0 +1,5 @@
+require 'doctor/version'
+require 'doctor/proxy/base'
+require 'doctor/proxy/return_type_error'
+require 'doctor/proxy/yard'
+require 'doctor/yard'
