@@ -56,9 +56,9 @@ module Doctor
       EOF
 
       if method_obj.scope == :class
-        if context.is_a?(Module)
+        if context.instance_of?(Module)
           context.class_eval(class_eval_str)
-        elsif context.is_a?(Class)
+        elsif context.instance_of?(Class)
           context.class_eval(class_eval_str)
         else
           fail NotImplementedError, "unknown context: #{context.class}"
