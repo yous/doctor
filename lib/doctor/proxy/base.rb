@@ -2,8 +2,9 @@ module Doctor
   module Proxy
     # Skeleton class for proxy.
     class Base
-      def initialize(target, tags)
+      def initialize(target, old_method, tags)
         @target = target
+        @old_method = old_method
         @tags = tags
       end
 
@@ -18,9 +19,10 @@ module Doctor
       end
 
       def method_missing(method_name, *args, &block)
-        check_parameter_type(method_name, *args, &block)
-        value = @target.__send__(method_name, *args, &block)
-        check_return_type(method_name, value)
+        fail unless @old_method.name == method_name
+        check_parameter_type(@old_method, *args, &block)
+        value = @old_method.call(*args, &block)
+        check_return_type(@old_method, value)
       end
 
       private

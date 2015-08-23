@@ -6,7 +6,7 @@ module Doctor
     class YARD < Base
       private
 
-      def check_parameter_type(method_name, *args, &_block)
+      def check_parameter_type(meth, *args, &_block)
         param_tags = @tags.select { |tag| tag[:tag_name] == 'param' }
         return unless param_tags
 
@@ -17,11 +17,11 @@ module Doctor
           next if types.any? { |type| arg.is_a?(Object.const_get(type)) }
 
           fail ArgumentError,
-               "#{@target} #{method_name}: expected type: #{types}, got: #{arg}"
+               "#{@target} #{meth.name}: expected type: #{types}, got: #{arg}"
         end
       end
 
-      def check_return_type(method_name, value)
+      def check_return_type(meth, value)
         return_tag = @tags.find { |tag| tag[:tag_name] == 'return' }
         return unless return_tag
 
@@ -30,7 +30,7 @@ module Doctor
         return if types.any? { |type| value.is_a?(Object.const_get(type)) }
 
         fail ReturnTypeError,
-             "#{@target} #{method_name}: expected type: #{types}, got: #{value}"
+             "#{@target} #{meth.name}: expected type: #{types}, got: #{value}"
       end
     end
   end

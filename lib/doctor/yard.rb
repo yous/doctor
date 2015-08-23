@@ -34,24 +34,23 @@ module Doctor
       tags = method_obj.tags.map do |tag|
         { tag_name: tag.tag_name, types: tag.types }
       end
-      new_method_name = proxy_method_name(method_obj.name)
+      method_name = method_obj.name
 
       class_eval_str = <<-EOF
-        singleton_class.send(:alias_method,
-                             :#{new_method_name}, :#{method_obj.name})
+        old_method = singleton_method(:#{method_name})
 
-        define_singleton_method(:#{method_obj.name}) do |*args, &block|
-          ::Doctor::Proxy::YARD.new(self, #{tags})
-            .__send__(:#{new_method_name}, *args, &block)
+        define_singleton_method(:#{method_name}) do |*args, &block|
+          ::Doctor::Proxy::YARD.new(self, old_method, #{tags})
+            .__send__(:#{method_name}, *args, &block)
         end
       EOF
 
       instance_eval_str = <<-EOF
-        alias_method :#{new_method_name}, :#{method_obj.name}
+        old_method = instance_method(:#{method_name})
 
-        define_method(:#{method_obj.name}) do |*args, &block|
-          ::Doctor::Proxy::YARD.new(self, #{tags})
-            .__send__(:#{new_method_name}, *args, &block)
+        define_method(:#{method_name}) do |*args, &block|
+          ::Doctor::Proxy::YARD.new(self, old_method.bind(self), #{tags})
+            .__send__(:#{method_name}, *args, &block)
         end
       EOF
 
@@ -70,15 +69,5 @@ module Doctor
       end
     end
     private_class_method :proxy_method
-
-    def self.proxy_method_name(method_name)
-      method_name = method_name.to_s
-      if method_name.end_with?('?') || method_name.end_with?('!')
-        "#{method_name[0...-1]}_without_doctor#{method_name[-1]}"
-      else
-        "#{method_name}_without_doctor"
-      end
-    end
-    private_class_method :proxy_method_name
   end
 end
