@@ -14,10 +14,11 @@ module Doctor
           break unless tag
           types = tag[:types]
 
-          next if types.any? { |type| arg.is_a?(Object.const_get(type)) }
+          next if types.any? { |type| arg.is_a?(::Object.const_get(type)) }
 
-          fail ArgumentError,
-               "#{@target} #{meth.name}: expected type: #{types}, got: #{arg}"
+          ::Kernel.fail(
+            ::ArgumentError,
+            "#{@target} #{meth.name}: expected type: #{types}, got: #{arg}")
         end
       end
 
@@ -27,10 +28,11 @@ module Doctor
 
         types = return_tag[:types]
         return if types.any? { |type| type == 'void' }
-        return if types.any? { |type| value.is_a?(Object.const_get(type)) }
+        return if types.any? { |type| value.is_a?(::Object.const_get(type)) }
 
-        fail ReturnTypeError,
-             "#{@target} #{meth.name}: expected type: #{types}, got: #{value}"
+        ::Kernel.fail(
+          ReturnTypeError,
+          "#{@target} #{meth.name}: expected type: #{types}, got: #{value}")
       end
     end
   end
